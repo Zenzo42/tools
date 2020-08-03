@@ -560,7 +560,7 @@ class H5PYField(filewriter.FTField):
         fl = self._h5object[...]
         if hasattr(fl, "decode") and not isinstance(fl, unicode):
             fl = fl.decode(encoding="utf-8")
-        if hasattr(fl, "asstr"):
+        if hasattr(fl, "asstr") and self.dtype in ['string', b'string']:
             fl = fl.asstr()
         return fl
 
@@ -605,7 +605,7 @@ class H5PYField(filewriter.FTField):
         fl = self._h5object.__getitem__(t)
         if hasattr(fl, "decode") and not isinstance(fl, unicode):
             fl = fl.decode(encoding="utf-8")
-        if hasattr(fl, "asstr"):
+        if hasattr(fl, "asstr") and self.dtype in ['string', b'string']:
             fl = fl.asstr()
         return fl
 
@@ -723,7 +723,7 @@ class H5PYLink(filewriter.FTLink):
         fl = self.parent.h5object[self.name][...]
         if hasattr(fl, "decode") and not isinstance(fl, unicode):
             fl = fl.decode(encoding="utf-8")
-        if hasattr(fl, "asstr"):
+        if hasattr(fl, "asstr") and self.dtype in ['string', b'string']:
             fl = fl.asstr()
         return fl
 
@@ -955,7 +955,7 @@ class H5PYAttribute(filewriter.FTAttribute):
         at = self._h5object[0][self.name]
         if hasattr(at, "decode") and not isinstance(at, unicode):
             at = at.decode(encoding="utf-8")
-        if hasattr(at, "asstr"):
+        if hasattr(at, "asstr") and self.dtype in ['string', b'string']:
             at = at.asstr()
         return at
 
@@ -1050,7 +1050,7 @@ class H5PYAttribute(filewriter.FTAttribute):
             at = self._h5object[0][self.name].__getitem__(t)
         if hasattr(at, "decode") and not isinstance(at, unicode):
             at = at.decode(encoding="utf-8")
-        if hasattr(at, "asstr"):
+        if hasattr(at, "asstr") and self.dtype in ['string', b'string']:
             at = at.asstr()
         return at
 
