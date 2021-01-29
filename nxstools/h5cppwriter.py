@@ -75,6 +75,8 @@ def _slice2selection(t, shape):
     :returns: hyperslab selection
     :rtype: :class:`h5cpp.dataspace.Hyperslab`
     """
+    if isinstance(t, h5cpp.dataspace.Hyperslab):
+        return t
     if t is Ellipsis:
         return None
     elif isinstance(t, slice):
@@ -85,13 +87,27 @@ def _slice2selection(t, shape):
         if stop < 0:
             stop == shape[0] + stop
         if t.step in [None, 1]:
-            return h5cpp.dataspace.Hyperslab(
-                offset=(start,), block=((stop - start),))
+            if t.stop in [h5cpp.dataspace.UNLIMITED]:
+                return h5cpp.dataspace.Hyperslab(
+                    offset=(start,),
+                    count=(h5cpp.dataspace.UNLIMITED,),
+                    stride=(1,))
+            else:
+                return h5cpp.dataspace.Hyperslab(
+                    offset=(start,), count=((stop - start),),
+                    stride=(1,))
         else:
-            return h5cpp.dataspace.Hyperslab(
-                offset=(start,),
-                count=int(math.ceil((stop - start) / float(t.step))),
-                stride=(t.step,))
+            if t.stop in [h5cpp.dataspace.UNLIMITED]:
+                return h5cpp.dataspace.Hyperslab(
+                    offset=(start,),
+                    count=(h5cpp.dataspace.UNLIMITED,),
+                    stride=(t.step,))
+            else:
+                return h5cpp.dataspace.Hyperslab(
+                    offset=(start,),
+                    count=(int(math.ceil(
+                        (stop - start) / float(t.step))),),
+                    stride=(t.step,))
     elif isinstance(t, (int, long)):
         return h5cpp.dataspace.Hyperslab(
             offset=(t,), block=(1,))
@@ -119,23 +135,35 @@ def _slice2selection(t, shape):
                 if stop < 0:
                     stop == shape[it] + stop
                 if tel.step in [None, 1]:
-                    offset.append(start)
-                    block.append(stop - start)
-                    count.append(1)
-                    stride.append(1)
+                    if tel.stop in [h5cpp.dataspace.UNLIMITED]:
+                        offset.append(start)
+                        block.append(1)
+                        count.append(h5cpp.dataspace.UNLIMITED)
+                        stride.append(1)
+                    else:
+                        offset.append(start)
+                        block.append(1)
+                        count.append(stop - start)
+                        stride.append(1)
                 else:
-                    offset.append(start)
-                    block.append(1)
-                    count.append(
-                        int(math.ceil(
-                            (stop - start) / float(tel.step))))
-                    stride.append(tel.step)
+                    if tel.stop in [h5cpp.dataspace.UNLIMITED]:
+                        offset.append(start)
+                        block.append(1)
+                        count.append(h5cpp.dataspace.UNLIMITED)
+                        stride.append(tel.step)
+                    else:
+                        offset.append(start)
+                        block.append(1)
+                        count.append(
+                            int(math.ceil(
+                                (stop - start) / float(tel.step))))
+                        stride.append(tel.step)
             elif tel is Ellipsis:
                 esize = len(shape) - len(t) + 1
                 for jt in range(esize):
                     offset.append(0)
-                    block.append(shape[it])
-                    count.append(1)
+                    block.append(1)
+                    count.append(shape[it])
                     stride.append(1)
                     if jt < esize - 1:
                         it += 1
