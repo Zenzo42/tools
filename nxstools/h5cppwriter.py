@@ -94,8 +94,7 @@ def _slice2selection(t, shape):
                     stride=(1,))
             else:
                 return h5cpp.dataspace.Hyperslab(
-                    offset=(start,), count=((stop - start),),
-                    stride=(1,))
+                    offset=(start,), block=((stop - start),))
         else:
             if t.stop in [h5cpp.dataspace.UNLIMITED]:
                 return h5cpp.dataspace.Hyperslab(
@@ -142,8 +141,8 @@ def _slice2selection(t, shape):
                         stride.append(1)
                     else:
                         offset.append(start)
-                        block.append(1)
-                        count.append(stop - start)
+                        block.append(stop - start)
+                        count.append(1)
                         stride.append(1)
                 else:
                     if tel.stop in [h5cpp.dataspace.UNLIMITED]:
