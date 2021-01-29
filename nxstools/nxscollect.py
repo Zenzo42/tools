@@ -767,8 +767,11 @@ class Link(Runner):
     epilog = "" \
         + " examples:\n" \
         + "       nxscollect link " \
-        + "/tmp/gpfs/raw/scan_234.nxs://entry/instrument/lambda " \
-        + "--name data --target /lambda.nxs://entry/data/data \n\n" \
+        + "scan_234.nxs://entry/instrument/lambda " \
+        + "--name data --target lambda.nxs://entry/data/data \n\n" \
+        + "       nxscollect link " \
+        + "scan_123.nxs://entry:NXentry/instrument/eiger:NXdetector " \
+        + "--target eiger.nxs://entry/data/data \n\n" \
         + "\n"
 
     def create(self):
@@ -869,6 +872,9 @@ class Execute(Runner):
         + "       nxscollect append -c1 /tmp/gpfs/raw/scan_234.nxs \n\n" \
         + "       nxscollect append -c32008:0,2 /ramdisk/scan_123.nxs \n\n" \
         + "       nxscollect append --test /tmp/gpfs/raw/scan_234.nxs \n\n" \
+        + "       nxscollect append scan_234.nxs --path " \
+        + "/scan/instrument/pilatus/data  " \
+        + "--inputfiles 'scan_%05d.tif:0:100'\n\n" \
         + "\n"
 
     def create(self):
