@@ -644,15 +644,17 @@ class FTVirtualFieldLayout(FTObject):
         """
         self._h5object.__setitem__(key, source._h5object)
 
-    def add(self, key, source):
+    def add(self, key, source, srckey=None):
         """ add external field to layout
 
         :param key: slide or selection
         :type key: :obj:`tuple`
         :param source: external field
         :type source: :class:`FTExternalField`
+        :param srckey: source slice
+        :type srckey: :obj:`tuple`
         """
-        self._h5object.__setitem__(key, source._h5object)
+        self._h5object.__setitem__(key, source._h5object, srckey)
 
 
 class FTExternalField(FTObject):

@@ -1245,27 +1245,34 @@ class H5CppVirtualFieldLayout(filewriter.FTVirtualFieldLayout):
     def __setitem__(self, key, source):
         """ add external field to layout
 
-        :param key: slide
-        :type key: :obj:`tuple`
+        :param key: slice hyperslab
+        :type key: :obj:`tuple or `:class:`h5cpp.dataspace.Hyperslab`
         :param source: external field
         :type source: :class:`H5PYExternalField`
         """
         self.add(key, source)
 
-    def add(self, key, source):
+    def add(self, key, source, srckey=None):
         """ add external field to layout
 
-        :param key: slide
-        :type key: :obj:`tuple`
+        :param key: slice or hyperslab
+        :type key: :obj:`tuple` or :class:`h5cpp.dataspace.Hyperslab`
         :param source: external field
         :type source: :class:`H5PYExternalField`
+        :param srckey: source slice or hyperslab
+        :type srckey: :obj:`tuple` or :class:`h5cpp.dataspace.Hyperslab`
         """
 
         selection = _slice2selection(key, self.shape)
         lds = h5cpp.dataspace.Simple(tuple(self.shape))
         lview = h5cpp.dataspace.View(lds, selection)
-        eview = h5cpp.dataspace.View(
-            h5cpp.dataspace.Simple(tuple(source.shape)))
+        if srckey is not None:
+            ssel = _slice2selection(srckey, source.shape)
+            eview = h5cpp.dataspace.View(
+                h5cpp.dataspace.Simple(tuple(source.shape)), ssel)
+        else:
+            eview = h5cpp.dataspace.View(
+                h5cpp.dataspace.Simple(tuple(source.shape)))
         fname = source.filename
         path = h5cpp.Path(source.fieldpath)
         self._h5object.add(h5cpp.property.VirtualDataMap(
